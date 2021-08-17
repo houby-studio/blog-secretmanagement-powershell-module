@@ -100,12 +100,12 @@ RoleDefinitions = @{ 'CONTOSO\DownloadPrivateFile' = @{ RoleCapabilityFiles = 'C
 
 We have our basic template created in `C:\JEA\LimitedUser.psrc`. Let's edit it to:
 
-* Define module `SecretManagement` to be imported inside this session
+* Define module `Microsoft.PowerShell.SecretManagement` to be imported inside this session
 * Define command `Get-PrivateFile` to be visible to user inside this session
 * Define command `Get-PrivateFile` inside scriptblock, which is the command to download required file
 
 ```json
-ModulesToImport  = 'SecretManagement'
+ModulesToImport  = 'Microsoft.PowerShell.SecretManagement'
 
 VisibleFunctions = @{ Name = 'Get-PrivateFile'; Parameters = @{ Name = 'Url' } }
 
@@ -126,12 +126,12 @@ FunctionDefinitions = @{ Name = 'Get-PrivateFile'; ScriptBlock = {
 
 We have our basic template created in `C:\JEA\SecretManager.psrc`. Let's edit it to:
 
-* Define module `SecretManagement` to be imported inside this session
+* Define module `Microsoft.PowerShell.SecretManagement` to be imported inside this session
 * Define command `Set-WebsiteCredential` to be visible to user inside this session
 * Define command `Set-WebsiteCredential` inside scriptblock, which is the command to set credential for limited user to use
 
 ```json
-ModulesToImport  = 'SecretManagement'
+ModulesToImport  = 'Microsoft.PowerShell.SecretManagement'
 
 VisibleFunctions = @{ Name = 'Set-WebsiteCredential'; Parameters = @{ Name = 'Credential' } }
 
