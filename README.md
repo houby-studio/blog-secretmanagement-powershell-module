@@ -23,11 +23,13 @@ For this example, I assume that you have Active Directory site with domain joine
 
 ## Getting started
 
-For the sake of simplicity, we won't create PowerShell module, which usually contains JEA session and role configuration files. We will create folder with those files on disk and we will use only commonly available commands. Everything we execute below is executed on target computer, let's call it **Srv001** in the domain contoso.com (Change according to you environment).
+For the sake of simplicity, we won't create PowerShell module, which usually contains JEA session and role configuration files. We will create folder with those files on disk and we will use only commonly available commands. Everything we execute below is executed on target computer, let's call it **Srv001** in the domain **contoso.com** (Change according to you environment).
 
 ### Install required modules
 
 Note: You may need to register PSGallery to be able to download following modules as described on [Microsoft docs](https://docs.microsoft.com/en-us/powershell/scripting/gallery/installing-psget?view=powershell-7).
+
+Start elevated PowerShell and run following commands:
 
 ```powershell
 # BEWARE: You need to run this only on computer, which does NOT not have enabled PowerShellGet just yet.
@@ -43,7 +45,9 @@ Install-Module -Name 'Microsoft.PowerShell.SecretManagement','SecretManagement.J
 
 ### Create gMSA account for JEA
 
-gMSA is great in many ways. We can use it to to run services like SQL Agent under that identity or in our case, run commands in JEA session under this account. None needs to know this password. AD manages passwords and their rotation just like with computer accounts.
+gMSA is great in many ways. We can use it to to run services like SQL Agent under that identity or in our case, run commands in JEA session under this account. No one needs to know this password. AD manages its passwords and their rotation just like with computer accounts.
+
+Start PowerShell with your domain admin account and run following commands:
 
 ```powershell
 # Supply account name, description and domain computer allowed to login with this account
@@ -57,7 +61,9 @@ New-ADServiceAccount -Name $GMSAName -DNSHostName "$GMSAName.contoso.com" -Princ
 
 ### Create JEA session configuration and JEA role files
 
-Note: You can refer to this documentation on what we exactly we create with [role](https://docs.microsoft.com/en-us/powershell/scripting/learn/remoting/jea/role-capabilities?view=powershell-7.1) and [session configuration](https://docs.microsoft.com/en-us/powershell/scripting/learn/remoting/jea/session-configurations?view=powershell-7.1) files.
+*Note: You can refer to this documentation on what we exactly create with [role](https://docs.microsoft.com/en-us/powershell/scripting/learn/remoting/jea/role-capabilities?view=powershell-7.1) and [session configuration](https://docs.microsoft.com/en-us/powershell/scripting/learn/remoting/jea/session-configurations?view=powershell-7.1) files.*
+
+Start PowerShell and run following commands:
 
 ```powershell
 # Create folder for JEA files
@@ -73,6 +79,8 @@ New-PSSessionConfigurationFile -SessionType RestrictedRemoteServer -Path "C:\JEA
 ### Create AD security groups
 
 We will create two AD groups. Members of the group `CONTOSO\DownloadPrivateFile` will be able to run the limited user command to download file from the website and members of the `CONTOSO\SecretManager` will be able to run command to set credentials used to access protected website.
+
+Start PowerShell with your domain admin account and run following commands:
 
 ```powershell
 # Create AD Group allowed to access JEA Endpoint and download files from website
@@ -154,6 +162,9 @@ FunctionDefinitions = @{ Name = 'Set-WebsiteCredential'; ScriptBlock = {
 
 We are ready to deploy our configuration, let's execute following command to register our JEA session configuration on our endpoint computer.
 
+
+Start elevated PowerShell and run following command:
+
 ```powershell
 Register-PSSessionConfiguration -Path 'C:\JEA\DownloadPrivateFile.pssc' -Name 'contoso.example.downloadprivatefile'
 ```
@@ -169,6 +180,8 @@ In our example we will assign roles to the following users.
 
 User `CONTOSO\admin` can now launch PowerShell and set credential by using following commands.
 
+Start PowerShell under `CONTOSO\admin` user context and run following commands:
+
 ```powershell
 $Credential = Get-Credential
 Invoke-Command -ComputerName 'Srv001' -ConfigurationName 'contoso.example.downloadprivatefile' -ScriptBlock { Set-WebsiteCredential -Credential $args[0] } -ArgumentList $Credential
@@ -179,6 +192,8 @@ Invoke-Command -ComputerName 'Srv001' -ConfigurationName 'contoso.example.downlo
 ### Download file
 
 User `CONTOSO\user` can now launch PowerShell and download file using following command.  
+
+Start PowerShell under `CONTOSO\user` user context and run following command:
 
 ```powershell
 Invoke-Command -ComputerName 'Srv001' -ConfigurationName 'contoso.example.downloadprivatefile' -ScriptBlock { Get-PrivateFile -Url 'https://contoso.com/private/file.txt' }
