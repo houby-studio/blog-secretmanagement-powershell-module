@@ -98,7 +98,7 @@ New-ADGroup -DisplayName $NewGroup -Name $NewGroup -GroupCategory Security -Grou
 
 We have our basic template created in `C:\JEA\DownloadPrivateFile.pssc`, let's edit it to include both role definitions.
 
-```json
+```powershell
 RoleDefinitions = @{ 'CONTOSO\DownloadPrivateFile' = @{ RoleCapabilityFiles = 'C:\JEA\LimitedUser.psrc' }; 'CONTOSO\SecretManager' = @{ RoleCapabilityFiles = 'C:\JEA\SecretManager.psrc' } }
 ```
 
@@ -112,7 +112,7 @@ We have our basic template created in `C:\JEA\LimitedUser.psrc`. Let's edit it t
 * Define command `Get-PrivateFile` to be visible to user inside this session
 * Define command `Get-PrivateFile` inside scriptblock, which is the command to download required file
 
-```json
+```powershell
 ModulesToImport  = 'Microsoft.PowerShell.SecretManagement'
 
 VisibleFunctions = @{ Name = 'Get-PrivateFile'; Parameters = @{ Name = 'Url' } }
@@ -138,7 +138,7 @@ We have our basic template created in `C:\JEA\SecretManager.psrc`. Let's edit it
 * Define command `Set-WebsiteCredential` to be visible to user inside this session
 * Define command `Set-WebsiteCredential` inside scriptblock, which is the command to set credential for limited user to use
 
-```json
+```powershell
 ModulesToImport  = 'Microsoft.PowerShell.SecretManagement'
 
 VisibleFunctions = @{ Name = 'Set-WebsiteCredential'; Parameters = @{ Name = 'Credential' } }
